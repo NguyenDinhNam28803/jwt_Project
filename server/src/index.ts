@@ -16,8 +16,9 @@ app.use(express.json())
 app.use('/api/auth', authUser);
 app.use('/api/user', userRouter)
 
+app.use("/", () => console.log("Hello, it's jwt website !"))
+
 connectDB().then(() => {
-  app.use("/", () => console.log("Hello, it's jwt website !"))
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
