@@ -1,10 +1,37 @@
 import { useState } from 'react';
 import { User, Mail, Lock, UserCircle } from 'lucide-react';
+import AuthServices from '../../services/auth.services';
+import type { LoginProps } from '../../types/LoginSignup';
+import type { SignupProps } from '../../types/LoginSignup';
+
+const authservices = new AuthServices();
 
 type AuthMode = 'login' | 'register';
 
 export default function AuthForm() {
   const [mode, setMode] = useState<AuthMode>('login');
+  const [loginData, setLoginData] = useState<LoginProps>({ username: '', password: '' });
+
+  const HandlChangePass = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginData({ ...loginData, password: e.target.value });
+  }
+
+  const HandleChangeUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginData({ ...loginData, username: e.target.value });
+  } 
+
+  const Login = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await authservices.login(loginData);
+      if (response.ok) {
+        console.log('Login successful');
+        console.log(response);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  }
 
   return (
     <div className="w-full max-w-md">
@@ -34,7 +61,7 @@ export default function AuthForm() {
 
         <div className="p-8">
           {mode === 'login' ? (
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={Login}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email hoặc Username
@@ -45,6 +72,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="text"
+                    value={loginData.username}
+                    onChange={HandleChangeUserName}
                     placeholder="Nhập email hoặc username"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -61,6 +90,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="password"
+                    value={loginData.password}
+                    onChange={HandlChangePass}
                     placeholder="Nhập mật khẩu"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
