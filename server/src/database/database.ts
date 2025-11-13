@@ -1,16 +1,5 @@
 import mongoose from 'mongoose'
 
-const maskUri = (raw?: string) => {
-  if (!raw) return ''
-  try {
-    const u = new URL(raw)
-    if (u.password) u.password = '***'
-    return u.toString()
-  } catch {
-    return '(invalid URI format)'
-  }
-}
-
 const connectDB = async () => {
   const uri = process.env.MONGODB_URI
 
@@ -24,12 +13,13 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 10000
     })
     console.log('MongoDB connected')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('MongoDB connection failed:', error)
     if (error?.name === 'MongooseServerSelectionError') {
       console.error(
         'Diagnosis: Could not reach any Atlas servers. Check IP whitelist, outbound firewall to *.mongodb.net:27017, DNS SRV resolution, and cluster readiness. URI:',
-        maskUri(uri)
+        uri
       )
     }
     process.exit(1)
