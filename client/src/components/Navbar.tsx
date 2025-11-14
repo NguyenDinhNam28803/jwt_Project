@@ -11,7 +11,7 @@ export default function Navbar() {
             <span className="text-xl font-bold text-white">SecureAuth</span>
           </div>
           <div className="flex gap-4">
-            <button onClick={() => navigate('/login')} className="px-6 py-2 rounded-lg text-white hover:bg-slate-700 transition">
+            <button onClick={() => navigate('/login')} className="px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-700 transition">
               Đăng nhập
             </button>
           </div>
