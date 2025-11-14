@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import UserServices from '../services/User.services'
 import { validationResult } from 'express-validator'
-import User, { IUser } from '../models/User'
+import User from '../models/User'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -49,8 +49,9 @@ const signup = async (req: Request, res: Response) => {
       message: 'User created successfully',
       user: userResponse
     })
-  } catch (error: any) {
-    console.error('Signup error:', error)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Signup error:', message)
     res.status(500).json({
       success: false,
       message: 'Internal server error'
@@ -115,8 +116,9 @@ const login = async (req: Request, res: Response) => {
       token,
       user: userResponse
     })
-  } catch (error: any) {
-    console.error('Login error:', error)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Login error:', message)
     res.status(500).json({
       success: false,
       message: 'Internal server error'
