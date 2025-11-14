@@ -11,3 +11,12 @@ export interface SignupProps {
   firstName: string;
   lastName: string;
 }
+
+export interface UserInfo {
+  _id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  __v: number;
+}

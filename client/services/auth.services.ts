@@ -55,4 +55,22 @@ export default class AuthServices {
       throw error;
     }
   }
+
+  async getUserInfo(token: string) {
+    try {
+      const response = await fetch(`${API}/api/user/info`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      return result;
+    }
+    catch (error) {
+      console.error("Get user info error:", error);
+      throw error;
+    }
+  }
 }
