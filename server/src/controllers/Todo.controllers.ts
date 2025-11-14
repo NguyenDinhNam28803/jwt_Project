@@ -1,4 +1,4 @@
-import e, { Request, Response } from 'express'
+import { Request, Response } from 'express'
 import TodoServices from '~/services/Todo.services'
 
 export const getTodoList = async (req: Request, res: Response) => {
