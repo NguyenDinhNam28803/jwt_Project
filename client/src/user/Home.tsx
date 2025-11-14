@@ -111,21 +111,6 @@ export default function Home() {
   if (isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        {/* Navigation */}
-        <nav className="backdrop-blur-md bg-slate-900/80 border-b border-slate-700/50 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-blue-500" />
-              <span className="text-xl font-bold text-white">Công việc của tôi</span>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="px-6 py-2 rounded-lg border border-slate-500 text-white hover:bg-red-600/20 transition"
-            >
-              Đăng xuất
-            </button>
-          </div>
-        </nav>
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
