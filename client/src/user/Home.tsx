@@ -235,9 +235,6 @@ export default function Home() {
             <button onClick={() => navigate('/login')} className="px-6 py-2 rounded-lg text-white hover:bg-slate-700 transition">
               Đăng nhập
             </button>
-            <button onClick={() => navigate('/signup')} className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
-              Đăng ký
-            </button>
           </div>
         </div>
       </nav>
@@ -254,7 +251,7 @@ export default function Home() {
             </p>
             <div className="flex gap-4 pt-4">
               <button 
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/login')}
                 className="px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition flex items-center gap-2"
               >
                 Bắt đầu ngay <ArrowRight className="w-5 h-5" />
