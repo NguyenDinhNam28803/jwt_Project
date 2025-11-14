@@ -20,7 +20,16 @@ const login = async (username: string, password: string) => {
   return user
 }
 
+const getUserInfo = async (userId: string) => {
+  const user = await User.findById(userId).select('-password')
+  if (!user) {
+    throw new Error('User not found')
+  }
+  return user
+}
+
 export default {
   signup,
-  login
+  login,
+  getUserInfo
 }

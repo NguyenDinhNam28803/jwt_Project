@@ -126,7 +126,45 @@ const login = async (req: Request, res: Response) => {
   }
 }
 
+const getUserInfo = async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Unauthorized - No token provided' })
+    }
+
+    const token = authHeader.split(' ')[1]
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload
+    const userId = decoded.id as string
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID'
+      })
+    }
+    const user = await UserServices.getUserInfo(userId)
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      user
+    })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Get user info error:', message)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
+}
+
 export default {
   signup,
-  login
+  login,
+  getUserInfo
 }

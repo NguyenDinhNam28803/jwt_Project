@@ -4,7 +4,8 @@ import Home from './user/Home';
 import Navbar from './components/Navbar';
 
 function App() {
-
+  const token = localStorage.getItem('token')?.toString()
+  
   return (
     <BrowserRouter>
       <Navbar />
