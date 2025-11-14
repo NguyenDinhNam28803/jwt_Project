@@ -17,6 +17,13 @@ const signup = async (req: Request, res: Response) => {
 
     const { username, email, password, firstName, lastName } = req.body
 
+    if (!username || !email || !password || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required'
+      })
+    }
+
     // Check for existing user
     const existingUser = await User.findOne({ $or: [{ username }, { email }] })
     if (existingUser) {
@@ -40,7 +47,7 @@ const signup = async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       message: 'User created successfully',
-      data: userResponse
+      user: userResponse
     })
   } catch (error: any) {
     console.error('Signup error:', error)

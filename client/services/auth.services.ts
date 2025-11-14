@@ -1,4 +1,4 @@
-import type { LoginProps } from "../types/LoginSignup";
+import type { LoginProps, SignupProps } from "../types/LoginSignup";
 
 const API = 'https://jwt-project-wpry.onrender.com' //import.meta.env.SERVER_URL;
 
@@ -12,10 +12,46 @@ export default class AuthServices {
         },
         body: JSON.stringify(data),
       });
-      return response;
+      const result = await response.json();
+      return result;
     }
     catch (error) {
       console.error("Login error:", error);
+      throw error;
+    }
+  }
+
+  async logout() {
+    try {
+      const response = await fetch(`${API}/api/user/logout`, {
+        method: "POST",
+        headers: {  
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      return response;
+    }
+    catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
+  }
+
+  async signup(data: SignupProps) {
+    try {
+      const response = await fetch(`${API}/api/user/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      return result;
+    }
+    catch (error) {
+      console.error("Signup error:", error);
       throw error;
     }
   }

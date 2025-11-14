@@ -3,6 +3,7 @@ import { User, Mail, Lock, UserCircle } from 'lucide-react';
 import AuthServices from '../../services/auth.services';
 import type { LoginProps } from '../../types/LoginSignup';
 import type { SignupProps } from '../../types/LoginSignup';
+import { showAlert } from '../utils/swal';
 
 const authservices = new AuthServices();
 
@@ -11,8 +12,50 @@ type AuthMode = 'login' | 'register';
 export default function AuthForm() {
   const [mode, setMode] = useState<AuthMode>('login');
   const [loginData, setLoginData] = useState<LoginProps>({ username: '', password: '' });
+  const [signupData, setSignupData] = useState<SignupProps>({ username: '', password: '', confirmPassword: '', email: '', firstName: '', lastName: '' });
 
-  const HandlChangePass = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const HandleNewUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, username: e.target.value });
+  }
+
+  const HandleNewEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, email: e.target.value });
+  }
+
+  const HandleNewPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, password: e.target.value });
+  }
+
+  const HandleConfirmNewPass = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, confirmPassword: e.target.value });
+  }
+
+  const HandleNewFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, firstName: e.target.value });
+  }
+
+  const HandleNewLastName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSignupData({ ...signupData, lastName: e.target.value });
+  }
+
+  const HandleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await authservices.signup(signupData);
+      if (response.success == true) {
+        showAlert(`Welcome new customer`,'Signup successful', 'success');
+        await authservices.login({ username: signupData.username, password: signupData.password });
+        console.log(response);
+      }
+      else {
+        showAlert('Signup failed !', response.message, 'error');
+      }
+    } catch (error) {
+      showAlert('Signup failed !',`Signup failed: ${error}`, 'error');
+    }
+  }
+
+  const HandleChangePass = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginData({ ...loginData, password: e.target.value });
   }
 
@@ -24,12 +67,15 @@ export default function AuthForm() {
     e.preventDefault();
     try {
       const response = await authservices.login(loginData);
-      if (response.ok) {
-        console.log('Login successful');
+      if (response.token) {
+        showAlert('Welcome back !','Login successful', 'success');
         console.log(response);
+      } 
+      else {
+        showAlert('Login failed !','Invalid username or password', 'error');
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      showAlert('Login failed !',`Login failed: ${error}`, 'error');
     }
   }
 
@@ -91,7 +137,7 @@ export default function AuthForm() {
                   <input
                     type="password"
                     value={loginData.password}
-                    onChange={HandlChangePass}
+                    onChange={HandleChangePass}
                     placeholder="Nhập mật khẩu"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -119,7 +165,7 @@ export default function AuthForm() {
               </button>
             </form>
           ) : (
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={HandleSignup}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,6 +177,8 @@ export default function AuthForm() {
                     </div>
                     <input
                       type="text"
+                      value={signupData.lastName}
+                      onChange={HandleNewLastName}
                       placeholder="Họ"
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     />
@@ -143,6 +191,8 @@ export default function AuthForm() {
                   </label>
                   <input
                     type="text"
+                    value={signupData.firstName}
+                    onChange={HandleNewFirstName}
                     placeholder="Tên"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -159,6 +209,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="text"
+                    value={signupData.username}
+                    onChange={HandleNewUserName}
                     placeholder="Chọn username"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -175,6 +227,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="email"
+                    value={signupData.email}
+                    onChange={HandleNewEmail}
                     placeholder="email@example.com"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -191,6 +245,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="password"
+                    value={signupData.password}
+                    onChange={HandleNewPassword}
                     placeholder="Tạo mật khẩu"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -207,6 +263,8 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="password"
+                    value={signupData.confirmPassword}
+                    onChange={HandleConfirmNewPass}
                     placeholder="Nhập lại mật khẩu"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
