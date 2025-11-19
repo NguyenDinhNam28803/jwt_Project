@@ -100,9 +100,10 @@ export default function Home() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('token')
     setIsLoggedIn(false)
+    window.location.reload()
     showAlert('Đăng xuất', 'Bạn đã đăng xuất thành công.', 'success')
     setTodos([])
   }
