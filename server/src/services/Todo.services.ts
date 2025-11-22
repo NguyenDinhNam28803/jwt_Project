@@ -15,8 +15,19 @@ const getTodosByUserId = async (userId: string) => {
   return todos
 }
 
+const updateTodo = async (todoId: string, updates: Partial<ITodo>) => {
+  const todo = await Todo.findByIdAndUpdate(todoId, updates, { new: true })
+  return todo
+}
+
+const deleteTodo = async (todoId: string) => {
+  await Todo.findByIdAndDelete(todoId)
+}
+
 export default {
   getTodoList,
   createTodo,
-  getTodosByUserId
+  getTodosByUserId,
+  updateTodo,
+  deleteTodo
 }

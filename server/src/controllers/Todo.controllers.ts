@@ -74,8 +74,60 @@ export const getTodosByUser = async (req: Request, res: Response) => {
   }
 }
 
+export const updateTodo = async (req: Request, res: Response) => {
+  try {
+    const todoId = req.params.id
+    const updates = req.body.updates
+    if (!todoId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request - Todo ID missing'
+      })
+    }
+    const updatedTodo = await TodoServices.updateTodo(todoId, updates)
+    res.status(200).json({
+      success: true,
+      message: 'Todo updated successfully',
+      todo_Updated: updatedTodo
+    })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Update Todo error:', message)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
+}
+
+export const deleteTodo = async (req: Request, res: Response) => {
+  try {
+    const todoId = req.params.id
+    if (!todoId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request - Todo ID missing'
+      })
+    }
+    await TodoServices.deleteTodo(todoId)
+    res.status(200).json({
+      success: true,
+      message: 'Todo deleted successfully'
+    })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Delete Todo error:', message)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
+}
+
 export default {
   getTodoList,
   createTodo,
-  getTodosByUser
+  getTodosByUser,
+  updateTodo,
+  deleteTodo
 }
