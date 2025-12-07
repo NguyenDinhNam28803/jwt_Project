@@ -8,7 +8,7 @@ export default function Navbar({user, isLogin}: {user?: string, isLogin: boolean
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Shield className="w-8 h-8 text-blue-500" />
-            <span className="text-xl font-bold text-white">SecureAuth</span>
+            <span onClick={() => navigate('/')} className="text-xl font-bold text-white cursor-pointer">SecureAuth</span>
           </div>
           <div className="flex gap-4">
             {user && isLogin ? (
@@ -22,10 +22,10 @@ export default function Navbar({user, isLogin}: {user?: string, isLogin: boolean
                   Đăng xuất
                 </button>
               </>
-            ) : null}
+            ) : 
             <button onClick={() => navigate('/login')} className="px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-700 transition">
               Đăng nhập
-            </button>
+            </button>}
           </div>
         </div>
     </nav>

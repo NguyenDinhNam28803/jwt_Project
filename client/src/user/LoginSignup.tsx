@@ -70,7 +70,6 @@ export default function AuthForm() {
       if (response.token) {
         showAlert('Welcome back !','Login successful', 'success');
         localStorage.setItem('token', response.token);
-        window.location.href = '/';
         console.log(response);
       } 
       else {

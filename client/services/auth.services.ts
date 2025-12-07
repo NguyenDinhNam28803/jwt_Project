@@ -1,6 +1,7 @@
 import type { LoginProps, SignupProps } from "../types/LoginSignup";
 
-const API = 'https://jwt-project-wpry.onrender.com' //import.meta.env.SERVER_URL;
+// const API = 'https://jwt-project-wpry.onrender.com' //import.meta.env.SERVER_URL;
+const API = 'http://localhost:3000';
 
 export default class AuthServices {
   async login(data: LoginProps) {
@@ -13,6 +14,7 @@ export default class AuthServices {
         body: JSON.stringify(data),
       });
       const result = await response.json();
+      console.log(result);
       return result;
     }
     catch (error) {
@@ -25,7 +27,7 @@ export default class AuthServices {
     try {
       const response = await fetch(`${API}/api/user/logout`, {
         method: "POST",
-        headers: {  
+        headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
