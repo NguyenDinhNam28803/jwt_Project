@@ -9,7 +9,7 @@ export default function Home() {
   const [todos, setTodos] = useState<ITodo[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [newTodo, setNewTodo] = useState({ title: '', description: '' })
+  const [newTodo, setNewTodo] = useState<Partial<ITodo>>({ title: '', description: '', priority: 'medium', category: '', tags: [], dueDate: '' })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const navigate = useNavigate()
   const [editingTodo, setEditingTodo] = useState<ITodo | null>(null)
@@ -45,7 +45,7 @@ export default function Home() {
   }
 
   const handleAddTodo = async () => {
-    if (!newTodo.title.trim()) {
+    if (!newTodo.title?.trim()) {
       setError('Tiêu đề không được để trống')
       showAlert('Lỗi', 'Tiêu đề không được để trống', 'error')
       return
@@ -59,12 +59,16 @@ export default function Home() {
       }
 
       const todo = await TodoService.createTodo(token, {
-        title: newTodo.title,
-        description: newTodo.description,
-        completed: false
+        title: String(newTodo.title),
+        description: String(newTodo.description || ''),
+        completed: false,
+        priority: (newTodo.priority as any) || 'medium',
+        category: newTodo.category || undefined,
+        tags: Array.isArray(newTodo.tags) ? newTodo.tags : (typeof newTodo.tags === 'string' ? (newTodo.tags as string).split(',').map(t => t.trim()).filter(Boolean) : []),
+        dueDate: newTodo.dueDate || undefined
       })
       setTodos([todo, ...todos])
-      setNewTodo({ title: '', description: '' })
+      setNewTodo({ title: '', description: '', priority: 'medium', category: '', tags: [], dueDate: '' })
       showAlert('Thành công', 'Công việc mới đã được tạo.', 'success')
       setError('')
     } catch (err) {
@@ -128,7 +132,22 @@ export default function Home() {
     try {
       const token = localStorage.getItem('token')
       if (!token) return
-      const updated = await TodoService.updateTodo(token, editingTodo._id || '', editingTodo)
+      // normalize tags to array when user types comma-separated string
+      const payload: Partial<ITodo> = {
+        title: editingTodo.title,
+        description: editingTodo.description,
+        completed: editingTodo.completed,
+        priority: editingTodo.priority,
+        category: editingTodo.category,
+        dueDate: editingTodo.dueDate
+      }
+      if (editingTodo.tags) {
+        payload.tags = Array.isArray(editingTodo.tags)
+          ? editingTodo.tags
+          : String(editingTodo.tags).split(',').map(t => t.trim()).filter(Boolean)
+      }
+
+      const updated = await TodoService.updateTodo(token, editingTodo._id || '', payload)
       if (updated) {
         setTodos(todos.map(t => t._id === editingTodo._id ? { ...updated, completed: updated.completed ?? false } : t))
       }
@@ -192,7 +211,7 @@ export default function Home() {
                   <input
                     type="text"
                     placeholder="Tiêu đề công việc..."
-                    value={newTodo.title}
+                    value={newTodo.title as string}
                     onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
                     className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-slate-800/80 transition-all duration-300 backdrop-blur-sm"
                   />
@@ -200,12 +219,52 @@ export default function Home() {
                 <div className="relative">
                   <textarea
                     placeholder="Mô tả chi tiết (tùy chọn)..."
-                    value={newTodo.description}
+                    value={newTodo.description as string}
                     onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })}
                     rows={3}
                     className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-slate-800/80 transition-all duration-300 backdrop-blur-sm resize-none"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <select
+                    value={String(newTodo.priority ?? 'medium')}
+                    onChange={(e) => setNewTodo({ ...newTodo, priority: e.target.value as any })}
+                    className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                  >
+                    <option value="low">Thấp</option>
+                    <option value="medium">Trung bình</option>
+                    <option value="high">Cao</option>
+                    <option value="urgent">Khẩn</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    placeholder="Danh mục (ví dụ: work)"
+                    value={newTodo.category || ''}
+                    onChange={(e) => setNewTodo({ ...newTodo, category: e.target.value })}
+                    className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Tags (phân cách bằng dấu phẩy)"
+                    value={(newTodo.tags ?? []).join(', ')}
+                    onChange={(e) => setNewTodo({ ...newTodo, tags: String(e.target.value).split(',').map(t => t.trim()).filter(Boolean) })}
+                    className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <label className="text-sm text-slate-400 block mb-1">Ngày hết hạn (tùy chọn)</label>
+                  <input
+                    type="datetime-local"
+                    value={newTodo.dueDate ? String(newTodo.dueDate).slice(0, 16) : ''}
+                    onChange={(e) => setNewTodo({ ...newTodo, dueDate: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                  />
+                </div>
+
                 <button
                   onClick={handleAddTodo}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
@@ -341,6 +400,45 @@ export default function Home() {
                       rows={4}
                       className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-slate-800/80 transition-all duration-300 resize-none"
                       placeholder="Mô tả chi tiết..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <select
+                      value={editingTodo.priority || 'medium'}
+                      onChange={(e) => setEditingTodo({ ...editingTodo, priority: e.target.value as any })}
+                      className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                    >
+                      <option value="low">Thấp</option>
+                      <option value="medium">Trung bình</option>
+                      <option value="high">Cao</option>
+                      <option value="urgent">Khẩn</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      placeholder="Danh mục"
+                      value={editingTodo.category || ''}
+                      onChange={(e) => setEditingTodo({ ...editingTodo, category: e.target.value })}
+                      className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Tags (phân cách bằng dấu phẩy)"
+                      value={(editingTodo.tags ?? []).join(', ')}
+                      onChange={(e) => setEditingTodo({ ...editingTodo, tags: String(e.target.value).split(',').map(t => t.trim()).filter(Boolean) })}
+                      className="px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="text-sm text-slate-400 block mb-1">Ngày hết hạn (tùy chọn)</label>
+                    <input
+                      type="datetime-local"
+                      value={editingTodo.dueDate ? String(editingTodo.dueDate).slice(0, 16) : ''}
+                      onChange={(e) => setEditingTodo({ ...editingTodo, dueDate: e.target.value })}
+                      className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white"
                     />
                   </div>
 

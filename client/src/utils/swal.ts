@@ -1,6 +1,9 @@
 import Swal from "sweetalert2";
-
+import todoServices from "../../services/todo.services";
 // Cấu hình chung (tùy chỉnh màu, icon, button...)
+
+const baseURL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
@@ -44,7 +47,17 @@ export const showConfirm = (
 };
 
 export const showAlert = (title: string, text: string, icon: 'success' | 'error' | 'info' | 'warning' = 'info') => {
-  Swal.fire(title, text, icon);
+  Swal.fire(title, text, icon).then(async () => {
+    // Optional callback after alert is closed
+     var token = localStorage.getItem('token');
+      if (token) {
+        try {
+          await todoServices.getTodosByUser(token);
+        } catch (error) {
+          console.error('Error fetching todos after alert:', error);
+        }
+      }
+  });
 };
 
 // Export default nếu muốn dùng trực tiếp
