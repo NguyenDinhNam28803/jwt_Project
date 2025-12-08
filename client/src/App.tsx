@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import type { UserInfo } from '../types/LoginSignup';
 import AuthServices from '../services/auth.services';
 import { showAlert } from './utils/swal';
+import ProfilePage from './user/Profile';
 
 const authServices = new AuthServices();
 
@@ -50,6 +51,11 @@ function App() {
         <Route path="/login" element={
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
             <AuthForm />
+          </div>
+        } />
+        <Route path="/profile" element={
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+            <ProfilePage userInfo={user!} />
           </div>
         } />
       </Routes>

@@ -29,7 +29,11 @@ export default function Home() {
     try {
       setLoading(true)
       const data = await TodoService.getTodosByUser(token)
-      setTodos(data)
+      const todosWithDefaults = data.map(todo => ({
+        ...todo,
+        completed: todo.completed ?? false
+      }))
+      setTodos(todosWithDefaults)
       setError('')
     } catch (err) {
       setError('Không thể tải danh sách công việc')
@@ -76,9 +80,9 @@ export default function Home() {
       if (!token || !todo._id) return
 
       const updated = await TodoService.updateTodo(token, todo._id, {
-        completed: !todo.completed
+        completed: !(todo.completed ?? false)
       })
-      setTodos(todos.map(t => t._id === updated._id ? updated : t))
+      setTodos(todos.map(t => t._id === updated._id ? { ...updated, completed: updated.completed ?? false } : t))
       showAlert('Thành công', 'Công việc đã được cập nhật.', 'success')
     } catch (err) {
       setError('Không thể cập nhật công việc')
@@ -122,7 +126,12 @@ export default function Home() {
     }
 
     try {
-      setTodos(todos.map(t => t._id === editingTodo._id ? editingTodo : t))
+      const token = localStorage.getItem('token')
+      if (!token) return
+      const updated = await TodoService.updateTodo(token, editingTodo._id || '', editingTodo)
+      if (updated) {
+        setTodos(todos.map(t => t._id === editingTodo._id ? { ...updated, completed: updated.completed ?? false } : t))
+      }
       setIsModalOpen(false)
       setEditingTodo(null)
       showAlert('Thành công', 'Công việc đã được cập nhật.', 'success')
@@ -237,23 +246,23 @@ export default function Home() {
                     <div className="relative bg-slate-900/80 backdrop-blur-xl border border-slate-700/30 rounded-2xl p-5 flex items-start gap-4 hover:border-blue-500/30 transition-all duration-300 shadow-lg">
                       <button
                         onClick={() => handleToggleTodo(todo)}
-                        className={`flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${todo.completed
+                        className={`flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${(todo.completed ?? false)
                           ? 'bg-gradient-to-br from-green-500 to-emerald-500 border-green-500 shadow-lg shadow-green-500/30'
                           : 'border-slate-600 hover:border-blue-500 hover:bg-blue-500/10'
                           }`}
                       >
-                        {todo.completed && <Check className="w-4 h-4 text-white" />}
+                        {(todo?.completed ?? false) && <Check className="w-4 h-4 text-white" />}
                       </button>
 
                       <div className="flex-1 min-w-0">
                         <h3
-                          className={`font-semibold text-lg transition-all duration-300 ${todo.completed ? 'text-slate-500 line-through' : 'text-white'
+                          className={`font-semibold text-lg transition-all duration-300 ${(todo.completed ?? false) ? 'text-slate-500 line-through' : 'text-white'
                             }`}
                         >
                           {todo.title}
                         </h3>
                         {todo.description && (
-                          <p className={`text-sm mt-2 leading-relaxed ${todo.completed ? 'text-slate-600' : 'text-slate-400'
+                          <p className={`text-sm mt-2 leading-relaxed ${(todo.completed ?? false) ? 'text-slate-600' : 'text-slate-400'
                             }`}>
                             {todo.description}
                           </p>

@@ -1,12 +1,12 @@
 import type { ITodo } from '../types/Todo'
 
-const baseURL = import.meta.env.VITE_SERVER_URL;
+const baseURL = 'https://jwt-project-wpry.onrender.com'
 
 class TodoService {
 
   async getTodosByUser(token: string): Promise<ITodo[]> {
     try {
-      if(!token) throw new Error('No token provided');
+      if (!token) throw new Error('No token provided');
       const response = await fetch(`${baseURL}/api/user/todos`, {
         method: 'GET',
         headers: {
