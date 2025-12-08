@@ -77,7 +77,7 @@ export const getTodosByUser = async (req: Request, res: Response) => {
 export const updateTodo = async (req: Request, res: Response) => {
   try {
     const todoId = req.params.id
-    const updates = req.body.updates
+    const updates = req.body
     if (!todoId) {
       return res.status(400).json({
         success: false,
@@ -88,7 +88,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Todo updated successfully',
-      todo_Updated: updatedTodo
+      todo: updatedTodo
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
