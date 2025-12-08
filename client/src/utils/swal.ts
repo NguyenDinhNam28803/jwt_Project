@@ -1,9 +1,6 @@
 import Swal from "sweetalert2";
 import todoServices from "../../services/todo.services";
 // Cấu hình chung (tùy chỉnh màu, icon, button...)
-
-const baseURL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
-
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
