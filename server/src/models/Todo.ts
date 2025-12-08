@@ -5,6 +5,13 @@ export interface ITodo {
   description: string
   completed: boolean
   userId: Types.ObjectId
+  priority?: 'low' | 'medium' | 'high' | 'urgent' // Độ ưu tiên
+  category?: string // Danh mục (work, personal, shopping...)
+  tags?: string[] // Các tag liên quan
+  dueDate?: Date | string // Ngày hết hạn
+  createdAt?: Date | string // Ngày tạo
+  updatedAt?: Date | string // Ngày cập nhật cuối
+  completedAt?: Date | string // Ngày hoàn thành
 }
 
 const todoSchema = new Schema<ITodo>({
