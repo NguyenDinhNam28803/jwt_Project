@@ -28,8 +28,17 @@ const getUserInfo = async (userId: string) => {
   return user
 }
 
+const updateUserInfo = async (userId: string, userData: IUser) => {
+  const user = await User.findByIdAndUpdate(userId, userData, { new: true })
+  if (!user) {
+    throw new Error('User not found')
+  }
+  return user
+}
+
 export default {
   signup,
   login,
-  getUserInfo
+  getUserInfo,
+  updateUserInfo
 }

@@ -163,8 +163,42 @@ const getUserInfo = async (req: Request, res: Response) => {
   }
 }
 
+const updateUserInfo = async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization
+    const token = authHeader?.split(' ')[1]
+    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as jwt.JwtPayload
+    const userId = decoded.id as string
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID'
+      })
+    }
+    const user = await UserServices.updateUserInfo(userId, req.body)
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      user: user
+    })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Update user info error:', message)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
+}
+
 export default {
   signup,
   login,
-  getUserInfo
+  getUserInfo,
+  updateUserInfo
 }
