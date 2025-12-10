@@ -1,6 +1,7 @@
 import type { ITodo } from '../types/Todo'
 
-const baseURL = 'https://jwt-project-wpry.onrender.com'
+// const baseURL = 'https://jwt-project-wpry.onrender.com'
+const baseURL = "http://localhost:3000"
 
 class TodoService {
 

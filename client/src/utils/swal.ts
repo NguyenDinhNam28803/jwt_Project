@@ -1,6 +1,10 @@
 import Swal from "sweetalert2";
 import todoServices from "../../services/todo.services";
+import AuthServices from "../../services/auth.services";
 // Cấu hình chung (tùy chỉnh màu, icon, button...)
+
+const authServices = new AuthServices();
+
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
@@ -50,6 +54,7 @@ export const showAlert = (title: string, text: string, icon: 'success' | 'error'
       if (token) {
         try {
           await todoServices.getTodosByUser(token);
+          await authServices.getUserInfo(token);
         } catch (error) {
           console.error('Error fetching todos after alert:', error);
         }

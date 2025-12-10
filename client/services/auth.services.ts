@@ -1,6 +1,7 @@
 import type { LoginProps, SignupProps } from "../types/LoginSignup";
 
-const API = import.meta.env.VITE_SERVER_URL;
+// const API = import.meta.env.VITE_SERVER_URL;
+const API = "http://localhost:3000"
 
 export default class AuthServices {
   async login(data: LoginProps) {

@@ -2,19 +2,24 @@ import { useState, useEffect } from 'react';
 import { User, Mail, Shield, Edit2, Save, X, Lock, LogOut, ArrowLeft } from 'lucide-react';
 import type { UserInfo } from '../../types/LoginSignup';
 import { showAlert } from '../utils/swal';
+import UserService from '../../services/user.services';
 
 interface UserProfile {
   userInfo: UserInfo;
 }
 
+const userService = new UserService();
+
 export default function ProfilePage({ userInfo }: UserProfile) {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
+  const [editForm, setEditForm] = useState<UserInfo>({
     firstName: '',
     lastName: '',
     email: '',
-    username: ''
+    username: '',
+    _id: '',
+    __v: 0
   });
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -29,7 +34,9 @@ export default function ProfilePage({ userInfo }: UserProfile) {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         email: userInfo.email,
-        username: userInfo.username
+        username: userInfo.username,
+        _id: userInfo._id,
+        __v: userInfo.__v
       });
     }
 
@@ -43,7 +50,9 @@ export default function ProfilePage({ userInfo }: UserProfile) {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         email: userInfo.email,
-        username: userInfo.username
+        username: userInfo.username,
+        _id: userInfo._id,
+        __v: userInfo.__v
       });
     }
     setIsEditing(!isEditing);
@@ -54,8 +63,8 @@ export default function ProfilePage({ userInfo }: UserProfile) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      // const updated = await userService.updateUserInfo(token, editForm);
-      // setUserInfo(updated);
+      const updated = await userService.updateUserInfo(token, editForm);
+      setEditForm(updated.user);
       setIsEditing(false);
       showAlert('Thành công', 'Cập nhật thông tin thành công', 'success');
     } catch (error) {
