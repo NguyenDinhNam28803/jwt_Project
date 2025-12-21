@@ -57,6 +57,8 @@ export const showAlert = (title: string, text: string, icon: 'success' | 'error'
           await authServices.getUserInfo(token);
         } catch (error) {
           console.error('Error fetching todos after alert:', error);
+        } finally {
+          window.location.reload();
         }
       }
   });
