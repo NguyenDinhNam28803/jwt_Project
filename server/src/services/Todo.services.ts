@@ -24,10 +24,15 @@ const deleteTodo = async (todoId: string) => {
   await Todo.findByIdAndDelete(todoId)
 }
 
+const getTodoById = async (todoId: string) => {
+  return await Todo.findById(todoId)
+}
+
 export default {
   getTodoList,
   createTodo,
   getTodosByUserId,
   updateTodo,
-  deleteTodo
+  deleteTodo,
+  getTodoById
 }

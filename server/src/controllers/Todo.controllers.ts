@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import TodoServices from '~/services/Todo.services'
+import EmailService from '~/services/email.services'
+import User from '~/models/User'
 
 export const getTodoList = async (req: Request, res: Response) => {
   try {
@@ -35,6 +37,24 @@ export const createTodo = async (req: Request, res: Response) => {
       userId
     }
     const todo = await TodoServices.createTodo(todoData)
+    
+    // Send email notification for new todo
+    try {
+      const user = await User.findById(userId)
+      if (user) {
+        const emailService = new EmailService()
+        await emailService.sendEmail(
+          user,
+          `✅ Todo mới: ${todo.title}`,
+          `Bạn vừa tạo một todo mới: ${todo.title}`,
+          todo,
+          todo._id.toString()
+        )
+      }
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError)
+    }
+    
     res.status(201).json({
       success: true,
       message: 'Todo created successfully',
@@ -85,6 +105,27 @@ export const updateTodo = async (req: Request, res: Response) => {
       })
     }
     const updatedTodo = await TodoServices.updateTodo(todoId, updates)
+    
+    // Send email notification for todo update
+    if (updatedTodo) {
+      try {
+        const user = await User.findById(updatedTodo.userId)
+        if (user) {
+          const emailService = new EmailService()
+          const action = updates.completed ? 'hoàn thành' : 'cập nhật'
+          await emailService.sendEmail(
+            user,
+            `🔄 Todo đã được ${action}: ${updatedTodo.title}`,
+            `Todo "${updatedTodo.title}" đã được ${action} thành công.`,
+            updatedTodo,
+            updatedTodo._id.toString()
+          )
+        }
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError)
+      }
+    }
+    
     res.status(200).json({
       success: true,
       message: 'Todo updated successfully',
@@ -109,7 +150,31 @@ export const deleteTodo = async (req: Request, res: Response) => {
         message: 'Bad Request - Todo ID missing'
       })
     }
+    // Get todo before deleting to get user info for email
+    const todo = await TodoServices.getTodoById(todoId)
+    
+    // Delete the todo
     await TodoServices.deleteTodo(todoId)
+    
+    // Send email notification for todo deletion
+    if (todo) {
+      try {
+        const user = await User.findById(todo.userId)
+        if (user) {
+          const emailService = new EmailService()
+          await emailService.sendEmail(
+            user,
+            `🗑️ Todo đã bị xóa: ${todo.title}`,
+            `Todo "${todo.title}" đã bị xóa khỏi danh sách của bạn.`,
+            todo,
+            todo._id.toString()
+          )
+        }
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError)
+      }
+    }
+    
     res.status(200).json({
       success: true,
       message: 'Todo deleted successfully'
